@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model audio {
+  audio_absolute_id_ignored Int      @id @default(autoincrement())
+  audio_id                  String   @unique
+  resource_path             String?
+  requested_by              String?
+  quran                     quran?
+  created_at                DateTime @default(now())
+}
+
+model guild {
+  id             String        @id @unique
+  azkar_channels Json          @default("{}")
+  audio_id       String
+  quran_channel  quranchannel?
+}
+
+model quran {
+  reciter  Json   @default("{}")
+  surah    Int
+  ayah     Int?
+  audio_id String @id @unique
+  audio    audio  @relation(fields: [audio_id], references: [audio_id])
+}
+
+model quranchannel {
+  id         String  @unique
+  message_id String?
+  created_by String
+  created_at String
+  guild_id   String  @id
+  guild      guild   @relation(fields: [guild_id], references: [id])
+}
